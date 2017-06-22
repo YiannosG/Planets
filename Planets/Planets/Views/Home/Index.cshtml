@@ -1,0 +1,110 @@
+﻿<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+    #planets {
+        cursor: pointer;
+        font-size: 40px;
+    }
+
+    #planetList {
+        margin-top: 50px;
+    }
+
+    ul li {
+        display: block;
+    }
+
+        ul li:hover, ul li:focus {
+            color: red;
+        }
+</style>
+
+
+<div id="body">
+    <div class="row">
+        <div id="planetList" class="col-md-4 col-xs-4 col-sm-4 col-lg-4">
+            <ul id="planets"></ul>
+        </div>
+        <div id="planetDetailsContainer" class="col-md-8 col-xs-8 col-sm-8 col-lg-8">
+            <table style="width: 100%" id="planetDetails">
+                <col style="width:20%">
+                <col style="width:80%">
+                <tr>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>Image</td>
+                    <td style="background-repeat:no-repeat" width="423" height="423" rowspan="1" valign="top" align="right" id="imageCell"></td>
+                </tr>
+                <tr>
+                    <td>ID</td>
+                    <td id="idCell"></td>
+                </tr>
+                <tr>
+                    <td>Name</td>
+                    <td id="nameCell"></td>
+                </tr>
+                <tr>
+                    <td>Mass</td>
+                    <td id="massCell"></td>
+                </tr>
+                <tr>
+                    <td>Diameter</td>
+                    <td id="diameterCell"></td>
+                </tr>
+                <tr>
+                    <td>Gravity</td>
+                    <td id="gravityCell"></td>
+                </tr>
+                <tr>
+                    <td>Length of Day</td>
+                    <td id="lengthOfDayCell"></td>
+                </tr>
+                <tr>
+                    <td>Distance from the Sun</td>
+                    <td id="distanceFromSunCell"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $.getJSON('/api/planet', function (planetsJsonPayload) {
+                $(planetsJsonPayload).each(function (i, item) {
+                    $('#planets').append('<li id="' + item.Id + '" >' + item.Name + '</li>');
+                });
+            });
+            setTimeout(function () {
+                $("#planets").children("li").click(function () {
+                    var rssId = $(this).attr("id");
+                    $.getJSON("/api/Planet/GetPlanet", { id: rssId })
+                        .done(function (planetJsonData) {
+                            $(planetJsonData).each(function (i, item) {
+                                $("#imageCell").attr("background", item.ImageFileName);
+                                $("#imageCell").attr("background-repeat", 'no-repeat');
+                                $("#idCell").text(item.Id);
+                                $("#nameCell").text(item.Name);
+                                $("#massCell").text(item.Mass);
+                                $("#diameterCell").text(item.Diameter);
+                                $("#gravityCell").text(item.Gravity);
+                                $("#lengthOfDayCell").text(item.LengthOfDay);
+                                $("#distanceFromSunCell").text(item.DistanceFromSun);
+                            });
+                        })
+                    .fail(function (xhr, status, error) {
+                        alert(error);
+                    });
+                });
+            }, 300
+            );
+        });
+
+    </script>
+}
