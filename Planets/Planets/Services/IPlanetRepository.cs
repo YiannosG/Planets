@@ -9,7 +9,7 @@ namespace Planets.Services
 {
     public interface IPlanetRepository
     {
-        Planet[] GetAllPlanets();
-        Planet GetPlanet(int planetId);
+        Planet[] GetAllPlanets(string system);
+        Planet GetPlanet(int planetId, string system);
     }
 }

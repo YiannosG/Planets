@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Http;
-using System.Web.Mvc;
-using Microsoft.Data.OData.Metadata;
+using Planets.Business;
 using Planets.Models;
 using Planets.Services;
 
@@ -16,6 +16,7 @@ namespace Planets.Controllers
 {
     public class PlanetController : ApiController
     {
+        PlanetGenerator generator = new PlanetGenerator();
         private IPlanetRepository _repo;
         public PlanetController(IPlanetRepository repo)
         {
@@ -24,25 +25,42 @@ namespace Planets.Controllers
 
         public PlanetController()
         {
-            _repo = new PlanetRepository();
+            _repo = new PlanetRepository(); // Just use repo
+            
         }
         /// <summary>
         /// Gets all planets
         /// </summary>
         /// <returns>An array of Planet objects</returns>
-        public Planet[] Get()
+        public Planet[] Get(string system="Solar")
         {
-            return _repo.GetAllPlanets();
+            //return _repo.GetAllPlanets(system);       <-- using just repo
+            // using Factory
+            PlanetarySystem mySystem;
+            switch (system)
+            {
+                case "Solar":
+                    mySystem = new Solar();
+                    break;
+                // other cases
+                default:
+                    mySystem = new Cnc55();
+                    break;
+            }
+            var planets = generator.GeneratePlanets(mySystem, new Planet());
+
+            return planets;
         }
 
         /// <summary>
         /// Returns a single Planet based on Planet ID
         /// </summary>
         /// <param name="id">Id of planet needed</param>
+        /// <param name="systemName">System name</param>
         /// <returns>A single Planet</returns>
-        public Planet GetPlanet(int id)
+        public Planet GetPlanet(int id, string systemName="Solar")
         {
-            var planet = _repo.GetPlanet(id);
+            var planet = _repo.GetPlanet(id, systemName);
             
             if (planet == null)
             {
